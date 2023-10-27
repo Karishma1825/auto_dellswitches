@@ -1,0 +1,48 @@
+---
+ - name: configure dell switches
+   hosts: switches
+   tasks:
+     - name: set hostname
+       dellos10_command:
+        commands: "hostname {{ new hostname }}"
+       register: result
+       ignore_errors: yes
+
+     - name: save configuration
+       dellos10_command:
+        commands: "write memory"
+       when: result.failed == false
+
+     - name: set enable password
+       dellos10_command:
+        commands: "enable password {{ new_enable_password }}"
+       register: result
+       ignore_errors: yes
+
+     - name: save configuration
+       dellos10_command:
+        commands: "write memory"
+       when: result.failed == false
+
+     - name: create vlan
+       dellos10_config:
+        vlan_id: "{{ vlan_id }}"
+        name: "{{ vlan_name }}"
+        state: present
+        provider: "{{ dell_switche_provider }}"
+
+     - name: assign interface  to vlan
+       dellos10_config:
+        intf_name: "{{ interface_name }}"
+        vlan: "{{ vlan_id }}"
+        access: yes
+        provider: "{{ dell_switch_provider }}"
+
+     - name: configure ip address
+       dellos10_config:
+        vlan_id: "{{ vlan_id }}"
+        ipv4_address: "{{ ip_address }}"
+        ipv4_mask: "{{ subnet_mask }}"
+        state: present
+        provider: "{{ dell_switch_provider }}"
+
