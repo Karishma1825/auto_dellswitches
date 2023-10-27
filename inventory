@@ -1,0 +1,9 @@
+switches:
+ hosts:
+  switch1:
+   ansible_host: 192.168.10.21
+   ansible_user: admin
+   ansible_password: admin
+vars:
+ ansible_connection: network_cli
+ ansible_network_os: dell
